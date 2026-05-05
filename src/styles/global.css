@@ -15,7 +15,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 齐云山背景 */
+/* 背景图 */
 body::before {
   content: '';
   position: fixed;
@@ -26,6 +26,14 @@ body::before {
   opacity: 0.18;
   z-index: -1;
   pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  body::before {
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(201, 169, 110, 0.03) 0%, transparent 60%),
+      url('/images/taisugong-mobile.jpg') center/cover no-repeat;
+  }
 }
 
 #app {
