@@ -3,11 +3,10 @@ import { ref } from 'vue'
 import TabBar from './components/TabBar.vue'
 import BaziPage from './components/BaziPage.vue'
 import CalendarView from './components/CalendarView.vue'
-import FortunePage from './components/FortunePage.vue'
 import ChatPanel from './components/ChatPanel.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 
-const activeTab = ref<'bazi' | 'calendar' | 'fortune' | 'chat'>('bazi')
+const activeTab = ref<'bazi' | 'calendar' | 'chat'>('bazi')
 const showSettings = ref(false)
 
 // 排盘结果，供多个 Tab 共享
@@ -27,7 +26,6 @@ const baziResult = ref<any>(null)
   <main class="page-content">
     <BaziPage v-if="activeTab === 'bazi'" v-model:result="baziResult" />
     <CalendarView v-else-if="activeTab === 'calendar'" />
-    <FortunePage v-else-if="activeTab === 'fortune'" :bazi-result="baziResult" />
     <ChatPanel v-else-if="activeTab === 'chat'" :bazi-result="baziResult" />
   </main>
 

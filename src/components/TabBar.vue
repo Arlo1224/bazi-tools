@@ -1,10 +1,9 @@
 <script setup lang="ts">
-const model = defineModel<'bazi' | 'calendar' | 'fortune' | 'chat'>()
+const model = defineModel<'bazi' | 'calendar' | 'chat'>()
 
 const tabs = [
   { key: 'bazi', label: '排盘' },
   { key: 'calendar', label: '黄历' },
-  { key: 'fortune', label: '流运' },
   { key: 'chat', label: 'AI' },
 ] as const
 </script>
