@@ -147,6 +147,16 @@ function wuxingClass(wuxing: string): string {
   const map: Record<string, string> = { '木': 'wuxing-wood', '火': 'wuxing-fire', '土': 'wuxing-earth', '金': 'wuxing-metal', '水': 'wuxing-water' }
   return map[wuxing] || ''
 }
+
+const zhiWuxingMap: Record<string, string> = {
+  '子': '水', '丑': '土', '寅': '木', '卯': '木',
+  '辰': '土', '巳': '火', '午': '火', '未': '土',
+  '申': '金', '酉': '金', '戌': '土', '亥': '水'
+}
+function charWuxingClass(c: string): string {
+  if (!c) return ''
+  return wuxingClass(tianGanWuxing[c] || zhiWuxingMap[c] || '')
+}
 </script>
 
 <template>
@@ -227,7 +237,9 @@ function wuxingClass(wuxing: string): string {
         <div v-if="queryLevel === 'year'" class="fortune-grid">
           <div v-for="item in liuNianResults" :key="item.year" class="fortune-item">
             <span class="f-label">{{ item.year }}年</span>
-            <span class="f-ganzi" :class="wuxingClass(item.wuxing)">{{ item.ganZhi }}</span>
+            <span class="f-ganzi">
+                <span :class="charWuxingClass(item.ganZhi[0])">{{ item.ganZhi[0] }}</span><span :class="charWuxingClass(item.ganZhi[1])">{{ item.ganZhi[1] }}</span>
+              </span>
             <span class="f-shishen">{{ item.shiShen }}</span>
           </div>
         </div>
@@ -236,7 +248,9 @@ function wuxingClass(wuxing: string): string {
         <div v-if="queryLevel === 'month'" class="fortune-grid">
           <div v-for="item in liuYueResults" :key="item.month" class="fortune-item">
             <span class="f-label">{{ item.month }}月</span>
-            <span class="f-ganzi" :class="wuxingClass(item.wuxing)">{{ item.ganZhi }}</span>
+            <span class="f-ganzi">
+                <span :class="charWuxingClass(item.ganZhi[0])">{{ item.ganZhi[0] }}</span><span :class="charWuxingClass(item.ganZhi[1])">{{ item.ganZhi[1] }}</span>
+              </span>
             <span class="f-shishen">{{ item.shiShen }}</span>
           </div>
         </div>
@@ -245,7 +259,9 @@ function wuxingClass(wuxing: string): string {
         <div v-if="queryLevel === 'day'" class="fortune-grid fortune-grid-dense">
           <div v-for="item in liuRiResults" :key="item.day" class="fortune-item fortune-item-sm">
             <span class="f-label">{{ item.day }}日</span>
-            <span class="f-ganzi" :class="wuxingClass(item.wuxing)">{{ item.ganZhi }}</span>
+            <span class="f-ganzi">
+                <span :class="charWuxingClass(item.ganZhi[0])">{{ item.ganZhi[0] }}</span><span :class="charWuxingClass(item.ganZhi[1])">{{ item.ganZhi[1] }}</span>
+              </span>
             <span class="f-shishen">{{ item.shiShen }}</span>
           </div>
         </div>
@@ -255,7 +271,9 @@ function wuxingClass(wuxing: string): string {
           <div v-for="item in liuShiResults" :key="item.hour" class="fortune-item">
             <span class="f-label">{{ item.shichen }}</span>
             <span class="f-time">{{ item.timeRange }}</span>
-            <span class="f-ganzi" :class="wuxingClass(item.wuxing)">{{ item.ganZhi }}</span>
+            <span class="f-ganzi">
+                <span :class="charWuxingClass(item.ganZhi[0])">{{ item.ganZhi[0] }}</span><span :class="charWuxingClass(item.ganZhi[1])">{{ item.ganZhi[1] }}</span>
+              </span>
             <span class="f-shishen">{{ item.shiShen }}</span>
           </div>
         </div>

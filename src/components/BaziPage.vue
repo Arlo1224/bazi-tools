@@ -91,9 +91,28 @@ function doPaipan() {
   }
 }
 
+// 天干→五行映射
+const ganWuxingMap: Record<string, string> = {
+  '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+  '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+}
+// 地支→五行映射
+const zhiWuxingMap: Record<string, string> = {
+  '子': '水', '丑': '土', '寅': '木', '卯': '木',
+  '辰': '土', '巳': '火', '午': '火', '未': '土',
+  '申': '金', '酉': '金', '戌': '土', '亥': '水'
+}
+
+function ganWuxing(c: string): string { return ganWuxingMap[c] || '' }
+function zhiWuxing(c: string): string { return zhiWuxingMap[c] || '' }
+
 function wuxingClass(wuxing: string): string {
   const map: Record<string, string> = { '木': 'wuxing-wood', '火': 'wuxing-fire', '土': 'wuxing-earth', '金': 'wuxing-metal', '水': 'wuxing-water' }
   return map[wuxing] || ''
+}
+
+function charWuxingClass(c: string): string {
+  return wuxingClass(ganWuxingMap[c] || zhiWuxingMap[c] || '')
 }
 </script>
 
@@ -216,13 +235,13 @@ function wuxingClass(wuxing: string): string {
             <td class="row-label">藏干</td>
             <td v-for="key in ['年柱', '月柱', '日柱', '时柱']" :key="key">
               <div class="canggan">
-                <span v-if="result[key]?.地支?.藏干?.主气" :class="wuxingClass('')">
+                <span v-if="result[key]?.地支?.藏干?.主气" :class="charWuxingClass(result[key].地支.藏干.主气.天干)">
                   {{ result[key].地支.藏干.主气.天干 }}<small>{{ result[key].地支.藏干.主气.十神 }}</small>
                 </span>
-                <span v-if="result[key]?.地支?.藏干?.中气">
+                <span v-if="result[key]?.地支?.藏干?.中气" :class="charWuxingClass(result[key].地支.藏干.中气.天干)">
                   {{ result[key].地支.藏干.中气.天干 }}<small>{{ result[key].地支.藏干.中气.十神 }}</small>
                 </span>
-                <span v-if="result[key]?.地支?.藏干?.余气">
+                <span v-if="result[key]?.地支?.藏干?.余气" :class="charWuxingClass(result[key].地支.藏干.余气.天干)">
                   {{ result[key].地支.藏干.余气.天干 }}<small>{{ result[key].地支.藏干.余气.十神 }}</small>
                 </span>
               </div>
@@ -257,13 +276,15 @@ function wuxingClass(wuxing: string): string {
 
       <!-- 大运 -->
       <div v-if="result.大运" class="dayun-section">
-        <h4>大运 <small>（起运{{ result.大运.起运年龄 }}岁，{{ result.大运.起运日期 }}）</small></h4>
+        <h4>大运 <small>（{{ result.大运.起运年龄 }}岁起运 · {{ result.大运.起运日期 }}）</small></h4>
         <div class="dayun-scroll">
           <div v-for="(dy, i) in result.大运.大运?.slice(0, 8)" :key="i" class="dayun-item">
-            <span class="dayun-age">{{ dy.起始年龄 }}岁</span>
-            <span class="dayun-ganzi" :class="wuxingClass(dy.天干?.五行)">{{ dy.干支 }}</span>
-            <span class="dayun-shishen">{{ dy.天干?.十神 }}</span>
-            <span class="dayun-year">{{ dy.起始年份 }}年</span>
+            <span class="dayun-year">{{ dy.开始年份 }}–{{ dy.结束 }}</span>
+            <span class="dayun-age">{{ dy.开始年龄 }}–{{ dy.结束年龄 }}岁</span>
+            <span class="dayun-ganzi">
+              <span :class="(dy.干支 || '')[0] ? charWuxingClass((dy.干支)[0]) : ''">{{ (dy.干支 || '')[0] || '' }}</span><span :class="(dy.干支 || '')[1] ? charWuxingClass((dy.干支)[1]) : ''">{{ (dy.干支 || '')[1] || '' }}</span>
+            </span>
+            <span class="dayun-shishen">{{ dy.天干十神 }}/{{ Array.isArray(dy.地支十神) ? dy.地支十神[0] : '' }}</span>
           </div>
         </div>
       </div>
