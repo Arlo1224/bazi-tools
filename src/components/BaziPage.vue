@@ -97,7 +97,7 @@ const relationDiagram = computed(() => {
 })
 
 const relLineColors: Record<string, string> = { '合': '#5a8a5a', '冲': '#c05050', '刑': '#c08040', '害': '#8a5aaa', '破': '#6a6a6a' }
-const svgHeight = computed(() => Math.max(relationDiagram.value.nodes.length * 52 + 20, 120))
+const svgHeight = computed(() => 40 + relationDiagram.value.edges.length * 20 + 10)
 
 // ── 排盘 ──
 function doPaipan() {
@@ -224,16 +224,17 @@ const fortuneResults = computed(() => {
           <span v-for="(clr,typ) in relLineColors" :key="typ" class="rel-legend-item"><i :style="{background:clr}"></i>{{typ}}</span>
         </div>
         <svg :viewBox="'0 0 360 '+svgHeight" class="rel-svg" :style="{height:svgHeight+'px'}">
-          <defs><marker id="arrowhead" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto"><polygon points="0 0, 6 2, 0 4" fill="#8a8a8a"/></marker></defs>
           <!-- 节点 -->
           <g v-for="(n,ni) in relationDiagram.nodes" :key="ni">
-            <rect :x="30+ni*52" y="8" width="48" height="28" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
-            <text :x="30+ni*52+24" y="26" text-anchor="middle" fill="var(--text-dim)" font-size="10">{{n}}</text>
+            <rect :x="18+ni*56" y="4" width="52" height="24" rx="4" fill="var(--bg)" stroke="var(--border)" stroke-width="1"/>
+            <text :x="18+ni*56+26" y="20" text-anchor="middle" fill="var(--text-dim)" font-size="10">{{n}}</text>
           </g>
-          <!-- 连线 -->
+          <!-- 每层一个关系，互不重叠 -->
           <g v-for="(e,ei) in relationDiagram.edges" :key="ei">
-            <path :d="'M'+(30+e.from*52+48)+' 22 Q'+(30+(e.from+e.to)/2*52+24)+' '+(22-14-4*ei)+' '+(30+e.to*52)+' 22'" :stroke="relLineColors[e.type]" stroke-width="1.5" fill="none" :stroke-dasharray="e.type==='冲'||e.type==='刑'?'4,2':(e.type==='害'||e.type==='破'?'2,3':'none')"/>
-            <text :x="30+(e.from+e.to)/2*52+24" :y="22-6-4*ei" text-anchor="middle" :fill="relLineColors[e.type]" font-size="9">{{e.scope}}{{e.type}}（{{e.detail}}）</text>
+            <line :x1="18+e.from*56+26" :y1="40+ei*20" :x2="18+e.to*56+26" :y2="40+ei*20" :stroke="relLineColors[e.type]" stroke-width="1.5" :stroke-dasharray="e.type==='冲'||e.type==='刑'?'4,2':(e.type==='害'||e.type==='破'?'2,3':'none')"/>
+            <line :x1="18+e.from*56+26" :y1="28" :x2="18+e.from*56+26" :y2="40+ei*20" :stroke="relLineColors[e.type]" stroke-width="0.8" :stroke-dasharray="e.type==='冲'||e.type==='刑'?'4,2':(e.type==='害'||e.type==='破'?'2,3':'none')"/>
+            <line :x1="18+e.to*56+26" :y1="28" :x2="18+e.to*56+26" :y2="40+ei*20" :stroke="relLineColors[e.type]" stroke-width="0.8" :stroke-dasharray="e.type==='冲'||e.type==='刑'?'4,2':(e.type==='害'||e.type==='破'?'2,3':'none')"/>
+            <text :x="18+(e.from+e.to)/2*56+26" :y="38+ei*20" text-anchor="middle" :fill="relLineColors[e.type]" font-size="9">{{e.scope}}{{e.type}} {{e.detail}}</text>
           </g>
         </svg>
       </div>
