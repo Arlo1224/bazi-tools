@@ -9,6 +9,7 @@ const emit = defineEmits<{ 'update:result': [val: any] }>()
 const { loadCities, provinceList, getCities, findCity } = useCities()
 
 // ── 表单状态 ──
+const personName = ref('')
 const birthYear = ref(1990)
 const birthMonth = ref(6)
 const birthDay = ref(15)
@@ -122,6 +123,7 @@ function doPaipan() {
     const entry = {
       id: Date.now(),
       time: new Date().toLocaleString('zh-CN'),
+      name: personName.value || '未命名',
       bazi: baziResult.八字,
       dayMaster: baziResult.日主,
       solar: baziResult.阳历,
@@ -138,8 +140,8 @@ function doPaipan() {
 
 function loadArchive(item: any) {
   result.value = { ...item.result, _meta: item.meta }
+  personName.value = item.name || ''
   emit('update:result', result.value)
-  // 滚动到结果区
   document.querySelector('.result-card')?.scrollIntoView({ behavior: 'smooth' })
 }
 
@@ -201,6 +203,7 @@ const fortuneResults = computed(() => {
       <div class="archive-list">
         <div v-for="a in archives" :key="a.id" class="archive-item" @click="loadArchive(a)">
           <div class="archive-main">
+            <span class="archive-name">{{ a.name }}</span>
             <span class="archive-bazi">{{ a.bazi }}</span>
             <span class="archive-meta">{{ a.gender }} · {{ a.solar }} · {{ a.lunar }}</span>
           </div>
@@ -212,6 +215,12 @@ const fortuneResults = computed(() => {
     <!-- ── 输入表单 ── -->
     <div class="card form-card">
       <h3 class="card-title">出生信息</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>姓名</label>
+          <input class="form-input" v-model="personName" placeholder="选填" />
+        </div>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label>年</label>
@@ -286,6 +295,7 @@ const fortuneResults = computed(() => {
     <div v-if="result" class="card result-card">
       <div class="result-header">
         <div>
+          <div v-if="personName" class="person-name">{{ personName }}</div>
           <div class="meta-info">
             <span>{{ result.阳历 }}</span>
             <span>农历：{{ result.农历 }}</span>
@@ -449,6 +459,7 @@ const fortuneResults = computed(() => {
 }
 .archive-item:hover { border-color: var(--accent); }
 .archive-main { display: flex; flex-direction: column; gap: 2px; }
+.archive-name { font-size: 13px; font-weight: 600; color: var(--text); }
 .archive-bazi { font-size: 15px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
 .archive-meta { font-size: 11px; color: var(--text-dim); }
 .archive-del { background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 4px 8px; }
@@ -456,6 +467,7 @@ const fortuneResults = computed(() => {
 
 /* 排盘结果 */
 .result-card { padding: 20px; }
+.person-name { font-size: 17px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
 
 .meta-info { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
 .true-solar-tag { background: var(--accent-dim); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 11px; }
