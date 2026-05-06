@@ -234,6 +234,9 @@ const fortuneResults = computed(() => {
           <!-- 每层一条直线，不拉长连线 -->
           <g v-for="(e,ei) in relationDiagram.edges" :key="ei">
             <line :x1="8+e.from*colW+nodeW/2" :y1="topH+ei*rowH+12" :x2="8+e.to*colW+nodeW/2" :y2="topH+ei*rowH+12" :stroke="relLineColors[e.type]" stroke-width="2" :stroke-dasharray="e.type==='冲'||e.type==='刑'?'5,3':(e.type==='害'||e.type==='破'?'3,3':'none')"/>
+            <!-- 两端小圆点 -->
+            <circle :cx="8+e.from*colW+nodeW/2" :cy="topH+ei*rowH+12" r="3" :fill="relLineColors[e.type]"/>
+            <circle :cx="8+e.to*colW+nodeW/2" :cy="topH+ei*rowH+12" r="3" :fill="relLineColors[e.type]"/>
             <text :x="8+(e.from+e.to)/2*colW+nodeW/2" :y="topH+ei*rowH+8" text-anchor="middle" :fill="relLineColors[e.type]" font-size="11">{{e.scope}}{{e.type}} {{e.detail}}</text>
           </g>
         </svg>
