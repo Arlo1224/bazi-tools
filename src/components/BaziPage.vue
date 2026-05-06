@@ -72,33 +72,23 @@ const dayMaster = computed(() => result.value?.日柱?.天干?.天干 || '')
 // ── 六柱数据 ──
 interface ExtraPillar { gan: string; zhi: string; ganWx: string; zhiWx: string; ganSs: string; zhiSs: string }
 const extraPillars = computed(() => {
-  const cols: { label: string; data: ExtraPillar | null }[] = [
-    { label: '大运', data: null },
-    { label: '流年', data: null },
-  ]
-  if (selectedDayunIdx.value != null || selectedLiuNian.value) {
-    // 尝试获取大运数据
-    const dy = result.value?.大运?.大运?.[selectedDayunIdx.value ?? 0]
-    if (dy) {
-      const gz = dy.干支 || ''
-      cols[0].data = {
-        gan: gz[0]||'', zhi: gz[1]||'',
-        ganWx: ganWuxingMap[gz[0]]||'', zhiWx: zhiWuxingMap[gz[1]]||'',
-        ganSs: dy.天干十神||'', zhiSs: (Array.isArray(dy.地支十神) ? dy.地支十神[0] : '')||'',
-      }
-    }
-    // 流年
-    if (selectedLiuNian.value) {
-      const gz = selectedLiuNian.value
-      cols[1].data = {
-        gan: gz[0]||'', zhi: gz[1]||'',
-        ganWx: ganWuxingMap[gz[0]]||'', zhiWx: zhiWuxingMap[gz[1]]||'',
-        ganSs: getShiShen(dayMaster.value, gz[0]), zhiSs: '',
-      }
-    }
+  const cols: { label: string; data: ExtraPillar | null }[] = []
+  // 流年在前
+  if (selectedLiuNian.value) {
+    const gz = selectedLiuNian.value
+    cols.push({
+      label: '流年', data: { gan: gz[0]||'', zhi: gz[1]||'', ganWx: ganWuxingMap[gz[0]]||'', zhiWx: zhiWuxingMap[gz[1]]||'', ganSs: getShiShen(dayMaster.value, gz[0]), zhiSs: '' }
+    })
   }
-  // 只返回有数据的列
-  return cols.filter(c => c.data)
+  // 大运在后
+  const dy = result.value?.大运?.大运?.[selectedDayunIdx.value ?? 0]
+  if (dy) {
+    const gz = dy.干支 || ''
+    cols.push({
+      label: '大运', data: { gan: gz[0]||'', zhi: gz[1]||'', ganWx: ganWuxingMap[gz[0]]||'', zhiWx: zhiWuxingMap[gz[1]]||'', ganSs: dy.天干十神||'', zhiSs: (Array.isArray(dy.地支十神) ? dy.地支十神[0] : '')||'' }
+    })
+  }
+  return cols
 })
 
 // ── 干支关系 ──
@@ -256,33 +246,34 @@ const fortuneResults = computed(() => {
           <thead>
             <tr>
               <th></th>
-              <th>年柱</th><th>月柱</th><th>日柱</th><th>时柱</th>
               <th v-for="ep in extraPillars" :key="ep.label" class="th-extra">{{ ep.label }}</th>
+              <th>年柱</th><th>月柱</th><th>日柱</th><th>时柱</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="row-label">天干</td>
-              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key">
-                <span class="gan" :class="wuxingClass(result[key]?.天干?.五行)">{{ result[key]?.天干?.天干 }}</span>
-                <span class="shishen">{{ result[key]?.天干?.十神 || '日主' }}</span>
-              </td>
               <td v-for="ep in extraPillars" :key="'g'+ep.label" class="td-extra">
                 <span class="gan" :class="wuxingClass(ep.data!.ganWx)">{{ ep.data!.gan }}</span>
                 <span class="shishen">{{ ep.data!.ganSs }}</span>
               </td>
+              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key">
+                <span class="gan" :class="wuxingClass(result[key]?.天干?.五行)">{{ result[key]?.天干?.天干 }}</span>
+                <span class="shishen">{{ result[key]?.天干?.十神 || '日主' }}</span>
+              </td>
             </tr>
             <tr>
               <td class="row-label">地支</td>
-              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key">
-                <span class="zhi" :class="wuxingClass(result[key]?.地支?.五行)">{{ result[key]?.地支?.地支 }}</span>
-              </td>
               <td v-for="ep in extraPillars" :key="'z'+ep.label" class="td-extra">
                 <span class="zhi" :class="wuxingClass(ep.data!.zhiWx)">{{ ep.data!.zhi }}</span>
+              </td>
+              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key">
+                <span class="zhi" :class="wuxingClass(result[key]?.地支?.五行)">{{ result[key]?.地支?.地支 }}</span>
               </td>
             </tr>
             <tr>
               <td class="row-label">藏干</td>
+              <td v-for="ep in extraPillars" :key="'cg'+ep.label" class="td-extra">-</td>
               <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key">
                 <div class="canggan">
                   <span v-if="result[key]?.地支?.藏干?.主气" :class="charWuxingClass(result[key].地支.藏干.主气.天干)">{{ result[key].地支.藏干.主气.天干 }}<small>{{ result[key].地支.藏干.主气.十神 }}</small></span>
@@ -290,12 +281,11 @@ const fortuneResults = computed(() => {
                   <span v-if="result[key]?.地支?.藏干?.余气" :class="charWuxingClass(result[key].地支.藏干.余气.天干)">{{ result[key].地支.藏干.余气.天干 }}<small>{{ result[key].地支.藏干.余气.十神 }}</small></span>
                 </div>
               </td>
-              <td v-for="ep in extraPillars" :key="'cg'+ep.label" class="td-extra">-</td>
             </tr>
             <tr>
               <td class="row-label">纳音</td>
-              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key"><span class="nayin">{{ result[key]?.纳音 }}</span></td>
               <td v-for="ep in extraPillars" :key="'ny'+ep.label" class="td-extra">-</td>
+              <td v-for="key in ['年柱','月柱','日柱','时柱']" :key="key"><span class="nayin">{{ result[key]?.纳音 }}</span></td>
             </tr>
           </tbody>
         </table>
