@@ -2,15 +2,21 @@
 import { ref } from 'vue'
 import TabBar from './components/TabBar.vue'
 import BaziPage from './components/BaziPage.vue'
+import CasesPage from './components/CasesPage.vue'
 import CalendarView from './components/CalendarView.vue'
 import ChatPanel from './components/ChatPanel.vue'
 import SettingsDrawer from './components/SettingsDrawer.vue'
 
-const activeTab = ref<'bazi' | 'calendar' | 'chat'>('bazi')
+const activeTab = ref<'bazi' | 'cases' | 'calendar' | 'chat'>('bazi')
 const showSettings = ref(false)
 
 // 排盘结果，供多个 Tab 共享
 const baziResult = ref<any>(null)
+
+function onCaseSelect(result: any, _name: string) {
+  baziResult.value = result
+  activeTab.value = 'bazi'
+}
 </script>
 
 <template>
@@ -24,7 +30,8 @@ const baziResult = ref<any>(null)
   </header>
 
   <main class="page-content">
-    <BaziPage v-if="activeTab === 'bazi'" v-model:result="baziResult" />
+    <BaziPage v-if="activeTab === 'bazi'" v-model:result="baziResult" :loaded-result="baziResult" />
+    <CasesPage v-else-if="activeTab === 'cases'" @select="onCaseSelect" />
     <CalendarView v-else-if="activeTab === 'calendar'" />
     <ChatPanel v-else-if="activeTab === 'chat'" :bazi-result="baziResult" />
   </main>

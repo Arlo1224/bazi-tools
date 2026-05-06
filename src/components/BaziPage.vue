@@ -4,6 +4,7 @@ import { buildBaziFromSolar, SolarDay, LunarHour } from 'cantian-tymext'
 import { useCities } from '@/composables/useCities'
 import { calcTrueSolarTime, formatTime } from '@/lib/trueSolarTime'
 
+const props = defineProps<{ loadedResult: any }>()
 const emit = defineEmits<{ 'update:result': [val: any] }>()
 const { loadCities, provinceList, getCities, findCity } = useCities()
 
@@ -22,6 +23,7 @@ const cityList = computed(() => getCities(province.value))
 const maxDays = computed(() => new Date(birthYear.value, birthMonth.value, 0).getDate())
 const fMaxDays = computed(() => new Date(fStartYear.value, fMonth.value, 0).getDate())
 watch(province, () => { const cs = getCities(province.value); if (cs.length) city.value = cs[0].name })
+watch(() => props.loadedResult, (val) => { if (val) { result.value = val } })
 onMounted(async () => {
   await loadCities(); if (provinceList.value.includes('安徽省')) { province.value = '安徽省'; city.value = '芜湖' }
   try { archives.value = JSON.parse(localStorage.getItem('bazi_archive')||'[]') } catch { archives.value = [] }
